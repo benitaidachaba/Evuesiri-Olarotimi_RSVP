@@ -284,7 +284,8 @@
     }
 
     .field-group input[type="text"],
-    .field-group input[type="tel"] {
+    .field-group input[type="tel"],
+    .field-group input[type="email"] {
       width: 100%;
       background: transparent;
       border: none;
@@ -584,7 +585,7 @@
       .hero-names { font-size: 3.5rem; }
       .section-subtitle { font-size: 1.1rem; }
       .field-group label { font-size: 0.9rem; }
-      .field-group input[type="text"], .field-group input[type="tel"] { font-size: 1.35rem; }
+      .field-group input[type="text"], .field-group input[type="tel"], .field-group input[type="email"] { font-size: 1.35rem; }
       .radio-option { padding: 1.2rem; }
       .radio-label { font-size: 1.2rem; }
       .note-card-text { font-size: 1.35rem; }
@@ -648,6 +649,12 @@
           <label for="phone">Phone Number *</label>
           <input type="tel" id="phone" name="phone" placeholder="+234 xxx xxx xxxx" required />
           <p class="field-error" id="err-phone">Please enter your phone number.</p>
+        </div>
+
+        <div class="field-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" placeholder="yourname@domain.com" required />
+          <p class="field-error" id="err-email">Please enter a valid email address.</p>
         </div>
 
         <div class="field-group">
@@ -797,8 +804,7 @@
   </footer>
 
   <script>
-    // PASTED YOUR GOOGLE WEB APP API LINK HERE
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznomRRGs9Bdgdkw1tnnyDMW5veQyE_V__hpbNonOpcn5YcShlAQLiDTRal9DuhJqwY2A/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwa7NQoSIgATKj7gPS1Q4PKsIHiQ7u-ydYsqcfY46BaIKmWnMfS_fcFrb0ZUA3k7Htf-A/exec";
 
     const form = document.getElementById('rsvpForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -822,6 +828,11 @@
 
       const phone = document.getElementById('phone').value.trim();
       showErr('phone', !phone); if (!phone) ok = false;
+
+      const email = document.getElementById('email').value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isEmailInvalid = !email || !emailRegex.test(email);
+      showErr('email', isEmailInvalid); if (isEmailInvalid) ok = false;
 
       const trad = getVal('tradMarriage');
       showErr('tradMarriage', !trad); if (!trad) ok = false;
@@ -851,6 +862,7 @@
       const payload = {
         fullName:     document.getElementById('fullName').value.trim(),
         phone:        document.getElementById('phone').value.trim(),
+        email:        document.getElementById('email').value.trim(),
         tradMarriage: getVal('tradMarriage'),
         whiteWedding: getVal('whiteWedding'),
         withSpouse:   getVal('withSpouse') || 'Not specified',
@@ -860,10 +872,9 @@
         timestamp:    new Date().toLocaleString()
       };
 
-      // Send to Google Sheets securely across servers via fetch
       fetch(SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors", // Allows clean background request sending without browser security blocks
+        mode: "no-cors", 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       })
